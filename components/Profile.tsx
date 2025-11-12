@@ -23,12 +23,6 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
       }
       setAngle(prevAngle => Math.round(prevAngle / 360) * 360);
       setVelocity(0);
-      
-      // Elegantly open the modal after a short delay
-      setTimeout(() => {
-        onSpinFinish();
-      }, 300);
-
       return;
     }
     
@@ -39,6 +33,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
   };
 
   const handleSpin = () => {
+    onSpinFinish(); // Trigger modal opening sequence immediately
     setVelocity(v => v + 30); // Kick
     if (!animationFrameId.current) {
       animationFrameId.current = requestAnimationFrame(animate);
