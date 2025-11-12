@@ -10,7 +10,7 @@ interface LinkButtonProps {
 }
 
 const LinkButton: React.FC<LinkButtonProps> = ({ icon, text, onClick, href, target, rel }) => {
-  const commonClasses = "relative flex items-center w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/20 transition-all duration-300 text-white font-semibold";
+  const commonClasses = "relative flex items-center w-full px-4 py-3 rounded-xl bg-white/[.07] hover:bg-white/15 border border-transparent hover:border-white/20 transition-all duration-300 text-white font-semibold";
 
   const content = (
     <>
