@@ -33,8 +33,8 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
   };
 
   const handleSpin = () => {
-    onSpinFinish(); // Trigger modal opening sequence immediately
-    setVelocity(v => v + 30); // Kick
+    onSpinFinish();
+    setVelocity(v => v + 30);
     if (!animationFrameId.current) {
       animationFrameId.current = requestAnimationFrame(animate);
     }
@@ -49,12 +49,12 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center text-center w-full px-4">
-      <div className={`w-32 h-32 md:w-40 md:h-40 mb-4 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
+    <div className="flex flex-col items-center text-center w-full px-2">
+      <div className={`w-24 h-24 sm:w-32 sm:h-32 mb-2 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
         <img
           src="/logo.png"
           alt="Nelore Brasil Logo"
-          className="w-full h-full object-contain cursor-pointer"
+          className="w-full h-full object-contain cursor-pointer drop-shadow-2xl"
           onClick={handleSpin}
           style={{
             transform: `perspective(1000px) rotateY(${angle}deg)`,
@@ -62,11 +62,11 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
           }}
         />
       </div>
-      <h1 className="font-display text-4xl md:text-5xl font-bold tracking-wider uppercase">
-        <span className="text-white">NELORE</span> <span style={{ color: '#850305' }}>BRASIL</span>
+      <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-widest uppercase mb-1">
+        <span className="text-white drop-shadow-md">NELORE</span> <span className="text-[#850305] drop-shadow-md">BRASIL</span>
       </h1>
-      <p className="mt-2 text-sm md:text-base text-neutral-300 max-w-sm">
-        Qualidade assim, você nunca viu!
+      <p className="text-xs sm:text-sm text-neutral-400 tracking-widest uppercase opacity-80">
+        Premium Meats
       </p>
     </div>
   );

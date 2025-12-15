@@ -57,33 +57,19 @@ const App: React.FC = () => {
     },
   });
 
-
-  // State for the review modal
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewStep, setReviewStep] = useState<'rating' | 'feedback'>('rating');
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
-  useEffect(() => {
-    if (activeModal !== ModalType.NONE) {
-      document.body.style.overflowY = 'hidden';
-    } else {
-      document.body.style.overflowY = 'auto';
-    }
-
-    return () => {
-      document.body.style.overflowY = 'auto';
-    };
-  }, [activeModal]);
+  // No longer locking body scroll here since index.html handles overflow:hidden globally for the main view
   
   useEffect(() => {
     if (isZooming) {
-      // Start opening the modal shortly after the zoom animation begins
       const openModalTimer = setTimeout(() => {
         handleOpenModal(ModalType.ABOUT);
       }, 250);
 
-      // Reset the transition state after the animation is complete
       const resetTransitionTimer = setTimeout(() => {
         setIsZooming(false);
       }, 600);
@@ -162,8 +148,6 @@ const App: React.FC = () => {
     e.preventDefault();
     
     const selectedItems = Object.entries(orderData.items)
-      // FIX: Cast the value to boolean to ensure correct type inference down the chain.
-      // Object.entries on a typed object without an index signature can lead to `unknown` values.
       .filter(([, isSelected]) => isSelected as boolean)
       .map(([itemName]) => {
           if (itemName === 'outros' && orderData.outrosText) {
@@ -223,7 +207,6 @@ const App: React.FC = () => {
 
   const handleFeedbackSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Placeholder for formsubmit.io integration
     console.log('Feedback to be sent:', feedbackMessage);
     alert('Obrigado pelo seu feedback! Vamos trabalhar para melhorar.');
     handleCloseModal();
@@ -247,7 +230,6 @@ const App: React.FC = () => {
   const handleKitOrderSubmit = (e: FormEvent) => {
     e.preventDefault();
     const selectedKits = Object.entries(kitOrderData.kits)
-      // FIX: Cast quantity to number to allow comparison.
       .filter(([, quantity]) => (quantity as number) > 0)
       .map(([kitName, quantity]) => {
           let name = '';
@@ -289,11 +271,10 @@ const App: React.FC = () => {
   };
   
   const getPickupTimeConstraints = () => {
-    const today = new Date().getDay(); // Sunday = 0, Monday = 1, etc.
-    if (today === 0) { // Sunday
+    const today = new Date().getDay();
+    if (today === 0) {
       return { min: '07:00', max: '13:00' };
     }
-    // Monday to Saturday
     return { min: '07:00', max: '21:00' };
   };
 
@@ -301,45 +282,45 @@ const App: React.FC = () => {
     const { min, max } = getPickupTimeConstraints();
     const itemCategories = [
         { id: 'carnes', label: 'Carnes' },
-        { id: 'acompanhamentos', label: 'Acompanhamentos' },
+        { id: 'acompanhamentos', label: 'Acomp.' },
         { id: 'kits', label: 'Kits' },
-        { id: 'panificadora', label: 'Panificadora' },
+        { id: 'panificadora', label: 'Pães' },
         { id: 'outros', label: 'Outros' },
     ];
     const kitOptions = [
       { id: 'proteina', label: 'Kit Proteína' },
-      { id: 'almocoJantar', label: 'Kit Almoço e Jantar' },
+      { id: 'almocoJantar', label: 'Kit Almoço/Jantar' },
       { id: 'semanal', label: 'Kit Semanal' },
       { id: 'churrasco', label: 'Kit Churrasco' },
     ];
 
     return (
-        <form onSubmit={handleOrderSubmit} className="space-y-4">
+        <form onSubmit={handleOrderSubmit} className="space-y-3">
             <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium">Seu nome</label>
-                <input type="text" id="name" name="name" onChange={handleOrderChange} value={orderData.name} required className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" />
+                <label htmlFor="name" className="block mb-1 text-xs uppercase tracking-wide text-neutral-400">Seu nome</label>
+                <input type="text" id="name" name="name" onChange={handleOrderChange} value={orderData.name} required className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none transition-colors" />
             </div>
             
             <div>
-                <label className="block mb-2 text-sm font-medium">O que você procura? (Opcional)</label>
-                <div className="grid grid-cols-2 gap-2">
+                <label className="block mb-1 text-xs uppercase tracking-wide text-neutral-400">Interesses</label>
+                <div className="flex flex-wrap gap-2">
                     {itemCategories.map(item => (
-                        <label key={item.id} htmlFor={item.id} className="flex items-center space-x-2 bg-black/20 border border-white/10 rounded-lg p-2.5 cursor-pointer has-[:checked]:bg-red-700/50 has-[:checked]:border-red-500 transition-colors">
-                            <input type="checkbox" id={item.id} name={item.id} onChange={handleOrderChange} checked={orderData.items[item.id as keyof typeof orderData.items]} className="w-4 h-4 text-red-600 bg-neutral-700 border-neutral-600 rounded focus:ring-red-500 flex-shrink-0" />
-                            <span className="min-w-0 break-words">{item.label}</span>
+                        <label key={item.id} className={`flex items-center space-x-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 cursor-pointer transition-all ${orderData.items[item.id as keyof typeof orderData.items] ? 'bg-red-900/40 border-red-500/50' : 'hover:bg-white/10'}`}>
+                            <input type="checkbox" id={item.id} name={item.id} onChange={handleOrderChange} checked={orderData.items[item.id as keyof typeof orderData.items]} className="hidden" />
+                            <span className={`text-xs font-medium ${orderData.items[item.id as keyof typeof orderData.items] ? 'text-white' : 'text-neutral-400'}`}>{item.label}</span>
                         </label>
                     ))}
                 </div>
             </div>
 
             {orderData.items.kits && (
-              <div className="p-3 bg-black/20 border border-white/10 rounded-lg space-y-2">
-                <label className="block text-sm font-medium">Selecione os kits desejados:</label>
+              <div className="p-3 bg-white/5 border border-white/10 rounded-lg space-y-2 animate-enter">
+                <label className="block text-xs uppercase tracking-wide text-neutral-400">Selecione os kits:</label>
                 <div className="grid grid-cols-2 gap-2">
                   {kitOptions.map(kit => (
-                      <label key={kit.id} htmlFor={kit.id} className="flex items-center space-x-2 bg-black/20 border border-white/10 rounded-lg p-2.5 cursor-pointer has-[:checked]:bg-red-700/50 has-[:checked]:border-red-500 transition-colors">
-                          <input type="checkbox" id={kit.id} name={kit.id} onChange={handleOrderChange} checked={orderData.selectedKits[kit.id as keyof typeof orderData.selectedKits]} className="w-4 h-4 text-red-600 bg-neutral-700 border-neutral-600 rounded focus:ring-red-500 flex-shrink-0" />
-                          <span className="min-w-0 break-words text-sm">{kit.label}</span>
+                      <label key={kit.id} className={`flex items-center justify-center text-center p-2 rounded border cursor-pointer transition-all ${orderData.selectedKits[kit.id as keyof typeof orderData.selectedKits] ? 'bg-red-900/40 border-red-500/50' : 'bg-transparent border-white/10 hover:bg-white/5'}`}>
+                          <input type="checkbox" id={kit.id} name={kit.id} onChange={handleOrderChange} checked={orderData.selectedKits[kit.id as keyof typeof orderData.selectedKits]} className="hidden" />
+                          <span className="text-xs">{kit.label}</span>
                       </label>
                   ))}
                 </div>
@@ -348,24 +329,23 @@ const App: React.FC = () => {
 
             {orderData.items.outros && (
                 <div>
-                    <label htmlFor="outrosText" className="block mb-2 text-sm font-medium">Especifique "Outros"</label>
-                    <input type="text" id="outrosText" name="outrosText" onChange={handleOrderChange} value={orderData.outrosText} placeholder="Ex: Bebidas, carvão..." className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" />
+                    <input type="text" id="outrosText" name="outrosText" onChange={handleOrderChange} value={orderData.outrosText} placeholder="O que você precisa?" className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none text-sm" />
                 </div>
             )}
 
-            <div>
-                <label htmlFor="pickupTime" className="block mb-2 text-sm font-medium">Horário de retirada (Opcional)</label>
-                <input type="time" id="pickupTime" name="pickupTime" onChange={handleOrderChange} value={orderData.pickupTime} min={min} max={max} className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" />
-                <p className="text-xs text-neutral-400 mt-1">Horário de funcionamento hoje: {min} - {max}</p>
+            <div className="grid grid-cols-2 gap-3">
+                <div>
+                    <label htmlFor="pickupTime" className="block mb-1 text-xs uppercase tracking-wide text-neutral-400">Retirada ({min}-{max})</label>
+                    <input type="time" id="pickupTime" name="pickupTime" onChange={handleOrderChange} value={orderData.pickupTime} min={min} max={max} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none text-sm" />
+                </div>
             </div>
 
             <div>
-                <label htmlFor="message" className="block mb-2 text-sm font-medium">Mensagem (Opcional)</label>
-                <textarea id="message" name="message" rows={3} onChange={handleOrderChange} value={orderData.message} placeholder="Alguma observação ou dúvida?" className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"></textarea>
+                <textarea id="message" name="message" rows={2} onChange={handleOrderChange} value={orderData.message} placeholder="Observações..." className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none text-sm"></textarea>
             </div>
 
-            <button type="submit" className="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
-                Enviar pedido via WhatsApp
+            <button type="submit" className="w-full bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-900/20 transform transition-all active:scale-[0.98]">
+                Enviar Pedido
             </button>
         </form>
     );
@@ -374,10 +354,9 @@ const App: React.FC = () => {
   const renderReviewModalContent = () => {
     if (reviewStep === 'rating') {
         return (
-            <div className="flex flex-col items-center text-center">
-                <p className="mb-4">Sua opinião é muito importante para nós!</p>
+            <div className="flex flex-col items-center text-center py-4">
                 <div 
-                    className="flex space-x-2 text-yellow-400"
+                    className="flex space-x-1 mb-6"
                     onMouseLeave={() => setHoverRating(0)}
                 >
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -385,36 +364,33 @@ const App: React.FC = () => {
                             key={star} 
                             onClick={() => handleRatingClick(star)}
                             onMouseEnter={() => setHoverRating(star)}
-                            className="p-1"
+                            className="p-1 transform hover:scale-110 transition-transform"
                         >
                             <StarIcon 
-                                className="w-8 h-8 transition-all duration-200"
+                                className="w-10 h-10 transition-colors duration-200"
                                 isFilled={star <= (hoverRating || rating)}
                             />
                         </button>
                     ))}
                 </div>
-                 <p className="text-xs text-neutral-400 mt-4">Clique para avaliar</p>
+                 <p className="text-sm text-neutral-400 uppercase tracking-widest">Toque para avaliar</p>
             </div>
         );
-    } else { // 'feedback' step
+    } else {
         return (
             <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-                <p>Lamentamos que sua experiência não tenha sido perfeita. Por favor, conte-nos como podemos melhorar:</p>
-                <div>
-                    <label htmlFor="feedbackMessage" className="sr-only">Sua mensagem</label>
-                    <textarea 
-                        id="feedbackMessage"
-                        name="feedbackMessage"
-                        rows={4}
-                        value={feedbackMessage}
-                        onChange={(e) => setFeedbackMessage(e.target.value)}
-                        placeholder="Deixe seu feedback aqui..."
-                        required
-                        className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-                    />
-                </div>
-                <button type="submit" className="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
+                <p className="text-sm text-neutral-300">Como podemos melhorar sua experiência?</p>
+                <textarea 
+                    id="feedbackMessage"
+                    name="feedbackMessage"
+                    rows={4}
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
+                    placeholder="Digite aqui..."
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none"
+                />
+                <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-neutral-200 transition-colors">
                     Enviar Feedback
                 </button>
             </form>
@@ -427,56 +403,54 @@ const App: React.FC = () => {
       case ModalType.ABOUT:
         return (
           <div className="space-y-6 text-center text-neutral-300">
-            <div className="flex justify-center items-center gap-3">
-              <span className="text-2xl">🥩</span>
-              <h3 className="font-display text-2xl tracking-wider uppercase">
-                <span className="text-white">NELORE</span> <span style={{ color: '#850305' }}>BRASIL</span>
-              </h3>
-            </div>
-            <p className="italic text-neutral-200">"A paixão pela carne transformada em arte."</p>
-
-            <div className="space-y-5 text-left pt-4">
-                <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 text-red-500 pt-1"><HeartIcon /></div>
-                    <div>
-                        <h4 className="font-bold text-white">Paixão e Tradição</h4>
-                        <p className="text-sm">Nascemos em Ponta Grossa com o propósito de elevar o padrão da carne premium, valorizando cada cliente.</p>
-                    </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 text-red-500 pt-1"><ShieldCheckIcon /></div>
-                    <div>
-                        <h4 className="font-bold text-white">Qualidade Garantida</h4>
-                        <p className="text-sm">Oferecemos cortes selecionados com origem controlada e procedência garantida, escolhidos com o máximo rigor.</p>
-                    </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 text-red-500 pt-1"><SparklesIcon /></div>
-                    <div>
-                        <h4 className="font-bold text-white">Uma Nova Experiência</h4>
-                        <p className="text-sm">Nossa estrutura foi pensada para encantar, do ambiente moderno ao cuidado em cada detalhe do preparo.</p>
-                    </div>
+             <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-900 to-black flex items-center justify-center border border-white/10 shadow-lg shadow-red-900/20">
+                    <span className="text-3xl">🥩</span>
                 </div>
             </div>
             
-            <p className="font-bold text-white pt-4">
-                <span className="font-display tracking-wider uppercase text-lg">
-                    <span className="text-white">NELORE</span> <span style={{ color: '#850305' }}>BRASIL</span>
-                </span>
-                <span className="font-sans normal-case tracking-normal"> — o sabor da excelência na sua mesa.</span>
+            <p className="text-lg font-light text-white leading-relaxed">
+              "A <span className="text-red-500 font-semibold">paixão</span> pela carne transformada em <span className="text-red-500 font-semibold">arte</span>."
             </p>
+
+            <div className="grid grid-cols-1 gap-4 text-left pt-2">
+                {[
+                    { icon: <HeartIcon className="w-5 h-5 text-red-500" />, title: "Paixão", desc: "Propósito de elevar o padrão." },
+                    { icon: <ShieldCheckIcon className="w-5 h-5 text-red-500" />, title: "Qualidade", desc: "Origem e procedência garantida." },
+                    { icon: <SparklesIcon className="w-5 h-5 text-red-500" />, title: "Experiência", desc: "Ambiente e preparo únicos." }
+                ].map((item, i) => (
+                    <div key={i} className="flex items-center space-x-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div className="flex-shrink-0 bg-black/40 p-2 rounded-lg">{item.icon}</div>
+                        <div>
+                            <h4 className="font-bold text-white text-sm">{item.title}</h4>
+                            <p className="text-xs text-neutral-400">{item.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
           </div>
         );
       case ModalType.LOCATION:
         return (
-          <div>
-            <p className="mb-4">
-              Estamos na R. Siqueira Campos, 1998 - Uvaranas, Ponta Grossa - PR.
-            </p>
-            <p className="font-bold">Horários:</p>
-            <p>Seg a Sáb: 07:00 - 21:00</p>
-            <p>Domingo: 07:00 - 13:00</p>
-            <div className="aspect-w-16 aspect-h-9 my-4 rounded-lg overflow-hidden border border-white/10" style={{aspectRatio: '16/9'}}>
+          <div className="space-y-4">
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10 text-center">
+                 <p className="text-sm text-neutral-300 mb-1">Endereço</p>
+                 <p className="font-medium text-white">R. Siqueira Campos, 1998</p>
+                 <p className="text-sm text-neutral-400">Uvaranas, Ponta Grossa - PR</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p className="text-xs text-red-400 font-bold uppercase mb-1">Seg - Sáb</p>
+                    <p className="text-sm font-semibold">07:00 - 21:00</p>
+                </div>
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p className="text-xs text-red-400 font-bold uppercase mb-1">Domingo</p>
+                    <p className="text-sm font-semibold">07:00 - 13:00</p>
+                </div>
+            </div>
+
+            <div className="rounded-xl overflow-hidden border border-white/10 h-40 relative group">
                 <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3612.7068611396953!2d-50.123185799999995!3d-25.111782499999997!2m3!1f0!2f0!3f0!3m2!1i1024!1i768!4f13.1!3m3!1m2!1s0x94e81b002070dde5%3A0x4a2deb2ba543261!2sNelore%20Brasil!5e0!3m2!1spt-BR!2sbr!4v1762874184008!5m2!1spt-BR!2sbr" 
                     width="100%" 
@@ -485,10 +459,11 @@ const App: React.FC = () => {
                     allowFullScreen={true}
                     loading="lazy" 
                     referrerPolicy="no-referrer-when-downgrade"
+                    className="grayscale group-hover:grayscale-0 transition-all duration-500"
                 ></iframe>
             </div>
-            <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="w-full mt-4 inline-block text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
-                Abrir no Google Maps
+            <a href={GOOGLE_MAPS_LINK} target="_blank" rel="noopener noreferrer" className="block w-full bg-white text-black font-bold text-center py-3 rounded-xl hover:bg-neutral-200 transition-colors">
+                Abrir no Maps
             </a>
           </div>
         );
@@ -498,97 +473,83 @@ const App: React.FC = () => {
         return renderReviewModalContent();
       case ModalType.DEVELOPER:
         return (
-          <div className="flex flex-col items-center text-center space-y-5">
-            <p className="text-sm text-neutral-300">
-              Este site foi desenvolvido com paixão e tecnologia pela InteligenciArte.IA.
+          <div className="flex flex-col items-center text-center space-y-6 py-4">
+             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center mb-2 animate-pulse">
+                <SparklesIcon className="w-10 h-10 text-white" />
+             </div>
+            <p className="text-sm text-neutral-300 max-w-xs mx-auto">
+              Transformamos ideias em experiências digitais de luxo.
             </p>
             
-            <div className="w-full">
-              <label htmlFor="devContactName" className="sr-only">Seu nome</label>
+            <div className="w-full space-y-3">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <UserIcon className="w-5 h-5 text-neutral-400" />
+                  <UserIcon className="w-4 h-4 text-neutral-500" />
                 </div>
                 <input
                   type="text"
-                  id="devContactName"
                   value={devContactName}
                   onChange={(e) => setDevContactName(e.target.value)}
                   placeholder="Seu nome"
-                  required
-                  className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 p-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
                 />
               </div>
-            </div>
 
-            <button 
-              onClick={handleDevContactSubmit} 
-              disabled={!devContactName.trim()}
-              className="relative w-full text-white font-medium rounded-lg text-sm px-5 py-3 text-center overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900"
-            >
-              <span className="relative z-10">Quer um site incrível como esse? Fale comigo! 🚀</span>
-            </button>
-
-            <div className="flex items-center space-x-2">
-              <p className="text-xs text-neutral-400">Ou siga-nos no Instagram:</p>
-              <a href={INSTAGRAM_LINK_DEV} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
-                <InstagramIcon className="w-5 h-5" />
-              </a>
+                <button 
+                onClick={handleDevContactSubmit} 
+                disabled={!devContactName.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                Quero um site desse! 🚀
+                </button>
             </div>
+            
+            <a href={INSTAGRAM_LINK_DEV} target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-500 hover:text-white transition-colors flex items-center gap-1">
+               <InstagramIcon className="w-3 h-3" /> @inteligenciarte.ia
+            </a>
           </div>
         );
       case ModalType.KITS:
         const { min, max } = getPickupTimeConstraints();
-        // FIX: Operator '+' cannot be applied to types 'unknown' and 'number'.
-        // This is resolved by explicitly typing the accumulator 'sum' as a number.
         const totalKitQuantity = Object.values(kitOrderData.kits).reduce((sum: number, qty) => sum + (qty as number), 0);
         const isKitSubmitDisabled = totalKitQuantity === 0 || !kitOrderData.name.trim() || !kitOrderData.pickupTime;
         
         const kitsInfo = [
-          { id: 'semanal', name: 'Kit Semanal', price: 'R$69,90', items: ['Acém em cubos - 400g', 'Músculo em cubos - 400g', 'Almondegas - 400g', 'Bife de peito de frango - 400g', 'Pernil de porco em cubos - 400g'] },
-          { id: 'almocoJantar', name: 'Kit Almoço e Jantar', price: 'R$129,90', items: ['Carne Moída - 800g', 'Bife Bovino - 800g', 'Músculo - 400g', 'Bife de peito de frango - 800g', 'Pernil de porco em cubos - 1200g'] },
-          { id: 'proteina', name: 'Kit Proteína', price: 'R$79,90', items: ['2 bandejas de carne moída - 400g', '2 bandejas de bife bovino - 400g', '1 bandeja de músculo - 400g'] },
+          { id: 'semanal', name: 'Kit Semanal', price: 'R$69,90', items: ['Acém cubos 400g', 'Músculo cubos 400g', 'Almondegas 400g', 'Peito Frango 400g', 'Pernil cubos 400g'] },
+          { id: 'almocoJantar', name: 'Almoço & Jantar', price: 'R$129,90', items: ['Moída 800g', 'Bife Bovino 800g', 'Músculo 400g', 'Peito Frango 800g', 'Pernil 1.2kg'] },
+          { id: 'proteina', name: 'Kit Proteína', price: 'R$79,90', items: ['2x Moída 400g', '2x Bife Bovino 400g', '1x Músculo 400g'] },
         ];
 
         return (
-          <form onSubmit={handleKitOrderSubmit} className="space-y-6">
-            <div className="space-y-4">
+          <form onSubmit={handleKitOrderSubmit} className="space-y-4">
+            <div className="space-y-3 overflow-y-auto max-h-[40vh] pr-1">
               {kitsInfo.map(kit => (
-                <div key={kit.id}>
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-lg text-white">{kit.name} <span className="text-red-500 font-normal">{kit.price}</span></h4>
-                    <div className="flex items-center space-x-3 bg-black/20 border border-white/10 rounded-full">
-                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], -1)} className="px-2 py-1 rounded-full hover:bg-white/10 transition-colors">-</button>
-                      <span className="font-bold text-white w-4 text-center">{kitOrderData.kits[kit.id as keyof KitOrderData['kits']]}</span>
-                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], 1)} className="px-2 py-1 rounded-full hover:bg-white/10 transition-colors">+</button>
+                <div key={kit.id} className="bg-white/5 p-3 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center mb-2">
+                    <div>
+                        <h4 className="font-bold text-white text-sm">{kit.name}</h4>
+                        <span className="text-xs text-red-400 font-bold">{kit.price}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 bg-black/40 rounded-lg p-1">
+                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], -1)} className="w-6 h-6 flex items-center justify-center rounded bg-white/10 hover:bg-white/20">-</button>
+                      <span className="font-bold text-white w-4 text-center text-sm">{kitOrderData.kits[kit.id as keyof KitOrderData['kits']]}</span>
+                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], 1)} className="w-6 h-6 flex items-center justify-center rounded bg-white/10 hover:bg-white/20">+</button>
                     </div>
                   </div>
-                  <ul className="list-disc list-inside text-neutral-300 mt-2 space-y-1 text-sm">
-                    {kit.items.map(item => <li key={item}>{item}</li>)}
-                  </ul>
-                  <hr className="border-white/10 mt-4" />
+                  <p className="text-xs text-neutral-400 leading-tight">
+                    {kit.items.join(' • ')}
+                  </p>
                 </div>
               ))}
-               <div>
-                  <h4 className="font-bold text-lg text-white">Kit Churrasco</h4>
-                  <p className="text-neutral-400 text-sm mt-2">Em breve mais detalhes sobre nosso kit churrasco!</p>
-                </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-white/10">
-                <div>
-                    <label htmlFor="kit-name" className="block mb-2 text-sm font-medium">Seu nome</label>
-                    <input type="text" id="kit-name" name="name" onChange={handleKitInfoChange} value={kitOrderData.name} required className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" />
-                </div>
-                 <div>
-                    <label htmlFor="kit-pickupTime" className="block mb-2 text-sm font-medium">Horário de retirada</label>
-                    <input type="time" id="kit-pickupTime" name="pickupTime" onChange={handleKitInfoChange} value={kitOrderData.pickupTime} min={min} max={max} required className="bg-black/20 border border-white/10 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" />
-                    <p className="text-xs text-neutral-400 mt-1">Horário de funcionamento hoje: {min} - {max}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                <input type="text" name="name" onChange={handleKitInfoChange} value={kitOrderData.name} required placeholder="Seu nome" className="bg-white/5 border border-white/10 text-white text-xs rounded-lg p-2.5 focus:border-red-500 outline-none" />
+                <input type="time" name="pickupTime" onChange={handleKitInfoChange} value={kitOrderData.pickupTime} min={min} max={max} required className="bg-white/5 border border-white/10 text-white text-xs rounded-lg p-2.5 focus:border-red-500 outline-none" />
             </div>
 
-            <button type="submit" disabled={isKitSubmitDisabled} className="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors disabled:bg-neutral-600 disabled:cursor-not-allowed">
-              Solicitar Kits via WhatsApp
+            <button type="submit" disabled={isKitSubmitDisabled} className="w-full bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              Pedir no WhatsApp
             </button>
           </form>
         );
@@ -598,20 +559,36 @@ const App: React.FC = () => {
   }, [activeModal, orderData, devContactName, rating, hoverRating, reviewStep, feedbackMessage, kitOrderData]);
 
   return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-between p-4 sm:p-6 md:p-8">
-        <main className="w-full max-w-lg mx-auto flex flex-col items-center gap-y-4 my-auto relative z-10">
-            <div className="w-full bg-black/30 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
-                <Profile onSpinFinish={handleSpinFinish} isZooming={isZooming} />
-                <div className="space-y-3">
-                    <LinkButton icon={<InfoIcon />} text="Quem Somos?" onClick={() => handleOpenModal(ModalType.ABOUT)} />
-                    <LinkButton icon={<WhatsAppIcon />} text="Faça seu Pedido" onClick={() => handleOpenModal(ModalType.ORDER)} />
-                    <LinkButton icon={<BoxIcon />} text="Nossos Kits" onClick={() => handleOpenModal(ModalType.KITS)} />
-                    <LinkButton icon={<InstagramIcon />} text="Nosso Instagram" href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer" />
-                    <LinkButton icon={<LocationIcon />} text="Localização e Horários" onClick={() => handleOpenModal(ModalType.LOCATION)} />
-                    <LinkButton icon={<StarIcon />} text="Avalie-nos" onClick={() => handleOpenModal(ModalType.REVIEW)} />
+      <div className="fixed inset-0 w-full h-[100svh] flex items-center justify-center overflow-hidden bg-black/50">
+        
+        {/* Main Card Container - Centered and constrained */}
+        <main className="w-full h-full max-w-[430px] flex flex-col items-center justify-center p-4 relative z-10 animate-enter">
+            
+            {/* Glass Card */}
+            <div className="w-full flex flex-col items-center bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
+                
+                {/* Top highlight glow */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
+                <div className="p-6 w-full flex flex-col items-center space-y-4 md:space-y-6">
+                    <Profile onSpinFinish={handleSpinFinish} isZooming={isZooming} />
+                    
+                    <div className="w-full space-y-2 md:space-y-3">
+                        <LinkButton icon={<InfoIcon />} text="Quem Somos?" onClick={() => handleOpenModal(ModalType.ABOUT)} />
+                        <LinkButton icon={<WhatsAppIcon />} text="Faça seu Pedido" onClick={() => handleOpenModal(ModalType.ORDER)} />
+                        <LinkButton icon={<BoxIcon />} text="Nossos Kits" onClick={() => handleOpenModal(ModalType.KITS)} />
+                        <LinkButton icon={<InstagramIcon />} text="Instagram" href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer" />
+                        <LinkButton icon={<LocationIcon />} text="Localização" onClick={() => handleOpenModal(ModalType.LOCATION)} />
+                        <LinkButton icon={<StarIcon />} text="Avalie-nos" onClick={() => handleOpenModal(ModalType.REVIEW)} />
+                    </div>
+                </div>
+
+                {/* Footer integrated inside the card design for mobile compactness */}
+                <div className="w-full bg-black/20 p-3 border-t border-white/5">
+                    <Footer onDeveloperClick={() => handleOpenModal(ModalType.DEVELOPER)} />
                 </div>
             </div>
-            <Footer onDeveloperClick={() => handleOpenModal(ModalType.DEVELOPER)} />
+
         </main>
         
         <Modal
