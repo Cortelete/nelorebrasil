@@ -16,6 +16,7 @@ import {
   ShieldCheckIcon,
   SparklesIcon,
   UserIcon,
+  BeefIcon,
 } from './constants';
 import { ModalType, OrderData, KitOrderData } from './types';
 import Profile from './components/Profile';
@@ -275,7 +276,7 @@ const App: React.FC = () => {
     if (today === 0) {
       return { min: '07:00', max: '13:00' };
     }
-    return { min: '07:00', max: '21:00' };
+    return { min: '07:00', max: '20:00' };
   };
 
   const renderOrderForm = () => {
@@ -402,31 +403,60 @@ const App: React.FC = () => {
     switch (activeModal) {
       case ModalType.ABOUT:
         return (
-          <div className="space-y-6 text-center text-neutral-300">
-             <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-900 to-black flex items-center justify-center border border-white/10 shadow-lg shadow-red-900/20">
-                    <span className="text-3xl">🥩</span>
+          <div className="flex flex-col items-center space-y-6 py-2">
+            
+            <div className="text-center relative">
+              <div className="absolute -inset-10 bg-red-900/20 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
+              <h1 className="font-display text-4xl font-bold tracking-widest uppercase relative z-10">
+                <span className="text-white drop-shadow-lg">NELORE</span> <span className="text-[#850305] drop-shadow-lg">BRASIL</span>
+              </h1>
+              <p className="text-[10px] text-neutral-500 tracking-[0.4em] uppercase mt-2">
+                Tradição & Qualidade
+              </p>
+            </div>
+
+            <div className="text-center space-y-4 px-2">
+              <p className="text-neutral-300 leading-relaxed font-light text-sm text-justify">
+                A <strong className="text-white">Nelore Brasil</strong> é sinônimo de excelência. Nossa missão é transformar o seu churrasco e o seu dia a dia, levando até a sua mesa cortes selecionados com rigoroso controle de procedência.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 w-full">
+                <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center space-x-4">
+                    <div className="p-2.5 bg-gradient-to-br from-red-900/20 to-black rounded-lg border border-red-900/10 text-[#850305]">
+                       <ShieldCheckIcon className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className="font-display text-base text-white tracking-wide uppercase">Qualidade</h3>
+                        <p className="text-[11px] text-neutral-400">Rigoroso controle sanitário.</p>
+                    </div>
+                </div>
+                
+                <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center space-x-4">
+                     <div className="p-2.5 bg-gradient-to-br from-red-900/20 to-black rounded-lg border border-red-900/10 text-[#850305]">
+                       <BeefIcon className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className="font-display text-base text-white tracking-wide uppercase">Premium</h3>
+                        <p className="text-[11px] text-neutral-400">Cortes nobres selecionados.</p>
+                    </div>
+                </div>
+
+                <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center space-x-4">
+                     <div className="p-2.5 bg-gradient-to-br from-red-900/20 to-black rounded-lg border border-red-900/10 text-[#850305]">
+                       <HeartIcon className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className="font-display text-base text-white tracking-wide uppercase">Paixão</h3>
+                        <p className="text-[11px] text-neutral-400">Amor pelo que fazemos.</p>
+                    </div>
                 </div>
             </div>
-            
-            <p className="text-lg font-light text-white leading-relaxed">
-              "A <span className="text-red-500 font-semibold">paixão</span> pela carne transformada em <span className="text-red-500 font-semibold">arte</span>."
-            </p>
 
-            <div className="grid grid-cols-1 gap-4 text-left pt-2">
-                {[
-                    { icon: <HeartIcon className="w-5 h-5 text-red-500" />, title: "Paixão", desc: "Propósito de elevar o padrão." },
-                    { icon: <ShieldCheckIcon className="w-5 h-5 text-red-500" />, title: "Qualidade", desc: "Origem e procedência garantida." },
-                    { icon: <SparklesIcon className="w-5 h-5 text-red-500" />, title: "Experiência", desc: "Ambiente e preparo únicos." }
-                ].map((item, i) => (
-                    <div key={i} className="flex items-center space-x-3 bg-white/5 p-3 rounded-xl border border-white/5">
-                        <div className="flex-shrink-0 bg-black/40 p-2 rounded-lg">{item.icon}</div>
-                        <div>
-                            <h4 className="font-bold text-white text-sm">{item.title}</h4>
-                            <p className="text-xs text-neutral-400">{item.desc}</p>
-                        </div>
-                    </div>
-                ))}
+            <div className="w-full text-center pt-2">
+               <p className="text-white font-medium italic text-sm border-t border-white/10 pt-4">
+                  "O verdadeiro sabor da carne de qualidade."
+               </p>
             </div>
           </div>
         );
@@ -442,7 +472,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-2 gap-3 text-center">
                 <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                     <p className="text-xs text-red-400 font-bold uppercase mb-1">Seg - Sáb</p>
-                    <p className="text-sm font-semibold">07:00 - 21:00</p>
+                    <p className="text-sm font-semibold">07:00 - 20:00</p>
                 </div>
                 <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                     <p className="text-xs text-red-400 font-bold uppercase mb-1">Domingo</p>

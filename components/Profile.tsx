@@ -66,7 +66,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
         <span className="text-white drop-shadow-md">NELORE</span> <span className="text-[#850305] drop-shadow-md">BRASIL</span>
       </h1>
       <p className="text-xs sm:text-sm text-neutral-400 tracking-widest uppercase opacity-80">
-        Premium Meats
+        A MELHOR
       </p>
     </div>
   );
