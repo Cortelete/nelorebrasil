@@ -62,6 +62,7 @@ const App: React.FC = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewStep, setReviewStep] = useState<'rating' | 'feedback'>('rating');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   // No longer locking body scroll here since index.html handles overflow:hidden globally for the main view
   
@@ -208,9 +209,39 @@ const App: React.FC = () => {
 
   const handleFeedbackSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Feedback to be sent:', feedbackMessage);
-    alert('Obrigado pelo seu feedback! Vamos trabalhar para melhorar.');
-    handleCloseModal();
+    setIsSubmittingFeedback(true);
+    
+    const data = {
+        _subject: "Novo Feedback - Nelore Brasil",
+        _captcha: "false",
+        avaliacao: `${rating} Estrelas`,
+        mensagem: feedbackMessage,
+    };
+
+    fetch("https://formsubmit.co/ajax/contato.nelorebrasil@gmail.com", {
+        method: "POST",
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if(response.ok) {
+            alert('Obrigado pelo seu feedback! Vamos trabalhar para melhorar.');
+            setFeedbackMessage('');
+            handleCloseModal();
+        } else {
+            alert('Ops! Algo deu errado. Tente novamente mais tarde.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar feedback:', error);
+        alert('Ops! Algo deu errado. Tente novamente mais tarde.');
+    })
+    .finally(() => {
+        setIsSubmittingFeedback(false);
+    });
   };
 
   const handleKitInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -391,8 +422,12 @@ const App: React.FC = () => {
                     required
                     className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none"
                 />
-                <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-neutral-200 transition-colors">
-                    Enviar Feedback
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingFeedback}
+                  className="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-neutral-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    {isSubmittingFeedback ? 'Enviando...' : 'Enviar Feedback'}
                 </button>
             </form>
         );
@@ -586,7 +621,7 @@ const App: React.FC = () => {
       default:
         return null;
     }
-  }, [activeModal, orderData, devContactName, rating, hoverRating, reviewStep, feedbackMessage, kitOrderData]);
+  }, [activeModal, orderData, devContactName, rating, hoverRating, reviewStep, feedbackMessage, kitOrderData, isSubmittingFeedback]);
 
   return (
       <div className="fixed inset-0 w-full h-[100svh] flex items-center justify-center overflow-hidden bg-black/50">
