@@ -443,7 +443,7 @@ const App: React.FC = () => {
             <div className="text-center relative">
               <div className="absolute -inset-10 bg-red-900/20 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
               <h1 className="font-display text-4xl font-bold tracking-widest uppercase relative z-10">
-                <span className="text-white drop-shadow-lg">NELORE</span> <span className="text-[#850305] drop-shadow-lg">BRASIL</span>
+                <span className="text-white drop-shadow-lg">NELORE</span> <span className="text-white drop-shadow-lg">BRASIL</span>
               </h1>
               <p className="text-[10px] text-neutral-500 tracking-[0.4em] uppercase mt-2">
                 Tradição & Qualidade
