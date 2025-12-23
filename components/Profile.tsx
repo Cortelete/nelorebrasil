@@ -62,9 +62,11 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
           }}
         />
       </div>
-      <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-widest uppercase mb-1">
-        <span className="text-white drop-shadow-md">NELORE</span> <span className="text-white drop-shadow-md">BRASIL</span>
-      </h1>
+      <img 
+        src="/titulo.png" 
+        alt="NELORE BRASIL" 
+        className="h-10 sm:h-12 mb-2 object-contain drop-shadow-md"
+      />
       <p className="text-xs sm:text-sm text-neutral-400 tracking-widest uppercase opacity-80">
         A MELHOR
       </p>
