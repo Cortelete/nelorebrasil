@@ -622,10 +622,10 @@ const App: React.FC = () => {
   }, [activeModal, orderData, devContactName, rating, hoverRating, reviewStep, feedbackMessage, kitOrderData, isSubmittingFeedback]);
 
   return (
-      <div className="fixed inset-0 w-full h-[100svh] flex items-center justify-center overflow-hidden bg-black/50">
+      <div className="fixed inset-0 w-full h-[100svh] overflow-y-auto bg-black/50">
         
         {/* Main Card Container - Centered and constrained */}
-        <main className="w-full h-full max-w-[430px] flex flex-col items-center justify-center p-4 relative z-10 animate-enter">
+        <main className="w-full min-h-full max-w-[430px] mx-auto flex flex-col items-center justify-center p-4 relative z-10 animate-enter">
             
             {/* Glass Card */}
             <div className="w-full flex flex-col items-center bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
