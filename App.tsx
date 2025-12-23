@@ -633,7 +633,7 @@ const App: React.FC = () => {
                 {/* Top highlight glow */}
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-                <div className="p-6 w-full flex flex-col items-center space-y-4 md:space-y-6">
+                <div className="px-6 pb-6 pt-3 w-full flex flex-col items-center space-y-4 md:space-y-6">
                     <Profile onSpinFinish={handleSpinFinish} isZooming={isZooming} />
                     
                     <div className="w-full space-y-2 md:space-y-3">

@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
 
   return (
     <div className="flex flex-col items-center text-center w-full px-2">
-      <div className={`w-[85%] max-w-[340px] aspect-square mb-2 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
+      <div className={`w-[85%] max-w-[340px] aspect-square mb-0 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
         <img
           src="/logo.png"
           alt="Nelore Brasil Logo"
@@ -62,7 +62,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
           }}
         />
       </div>
-      <p className="font-display text-sm sm:text-base text-neutral-400 tracking-[0.3em] uppercase opacity-80 mt-1">
+      <p className="font-display text-sm sm:text-base text-neutral-400 tracking-[0.3em] uppercase opacity-80 -mt-2">
         A MELHOR
       </p>
     </div>
