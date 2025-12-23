@@ -64,8 +64,6 @@ const App: React.FC = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
-  // No longer locking body scroll here since index.html handles overflow:hidden globally for the main view
-  
   useEffect(() => {
     if (isZooming) {
       const openModalTimer = setTimeout(() => {
@@ -622,21 +620,22 @@ const App: React.FC = () => {
   }, [activeModal, orderData, devContactName, rating, hoverRating, reviewStep, feedbackMessage, kitOrderData, isSubmittingFeedback]);
 
   return (
-      <div className="fixed inset-0 w-full h-[100svh] overflow-y-auto bg-black/50">
+      <div className="fixed inset-0 w-full h-[100svh] overflow-hidden bg-black/50 flex items-center justify-center p-3 sm:p-4">
         
         {/* Main Card Container - Centered and constrained */}
-        <main className="w-full min-h-full max-w-[430px] mx-auto flex flex-col items-center justify-center p-4 relative z-10 animate-enter">
+        <main className="w-full max-w-[400px] max-h-full flex flex-col relative z-10 animate-enter">
             
             {/* Glass Card */}
-            <div className="w-full flex flex-col items-center bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
+            <div className="w-full flex flex-col bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative max-h-full">
                 
                 {/* Top highlight glow */}
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-                <div className="px-6 pb-6 pt-3 w-full flex flex-col items-center space-y-4 md:space-y-6">
+                {/* Content Area - allows internal scrolling if absolutely necessary, but styled to fit */}
+                <div className="flex-1 flex flex-col items-center justify-center px-4 pt-2 pb-2 w-full overflow-y-auto no-scrollbar">
                     <Profile onSpinFinish={handleSpinFinish} isZooming={isZooming} />
                     
-                    <div className="w-full space-y-2 md:space-y-3">
+                    <div className="w-full space-y-2 mt-2">
                         <LinkButton icon={<InfoIcon />} text="Quem Somos?" onClick={() => handleOpenModal(ModalType.ABOUT)} />
                         <LinkButton icon={<WhatsAppIcon />} text="Faça seu Pedido" onClick={() => handleOpenModal(ModalType.ORDER)} />
                         <LinkButton icon={<BoxIcon />} text="Nossos Kits" onClick={() => handleOpenModal(ModalType.KITS)} />
@@ -647,7 +646,7 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Footer integrated inside the card design for mobile compactness */}
-                <div className="w-full bg-black/20 p-3 border-t border-white/5">
+                <div className="w-full bg-black/20 p-2 sm:p-3 border-t border-white/5 shrink-0">
                     <Footer onDeveloperClick={() => handleOpenModal(ModalType.DEVELOPER)} />
                 </div>
             </div>

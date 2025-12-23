@@ -11,7 +11,8 @@ interface LinkButtonProps {
 
 const LinkButton: React.FC<LinkButtonProps> = ({ icon, text, onClick, href, target, rel }) => {
   // Alterado para justify-center para centralizar o texto
-  const commonClasses = "group relative flex items-center justify-center w-full px-4 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/20 border border-white/5 hover:border-white/20 transition-all duration-300 text-white backdrop-blur-md overflow-hidden";
+  // Reduzido padding vertical para py-2.5 para melhor ajuste em mobile sem rolagem
+  const commonClasses = "group relative flex items-center justify-center w-full px-4 py-2.5 sm:py-3.5 rounded-xl bg-gradient-to-r from-white/5 to-white/10 hover:from-white/10 hover:to-white/20 border border-white/5 hover:border-white/20 transition-all duration-300 text-white backdrop-blur-md overflow-hidden";
   
   const content = (
     <>
