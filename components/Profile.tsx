@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
 
   return (
     <div className="flex flex-col items-center text-center w-full px-2">
-      <div className={`w-24 h-24 sm:w-32 sm:h-32 mb-2 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
+      <div className={`w-36 h-36 sm:w-48 sm:h-48 mb-4 transition-all duration-500 ease-in-out ${isZooming ? 'scale-[5] opacity-0' : 'scale-1'}`}>
         <img
           src="/logo.png"
           alt="Nelore Brasil Logo"

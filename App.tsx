@@ -442,7 +442,7 @@ const App: React.FC = () => {
             
             <div className="text-center relative">
               <div className="absolute -inset-10 bg-red-900/20 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
-              <img src="/titulo.png" alt="Nelore Brasil" className="h-10 sm:h-12 object-contain relative z-10 drop-shadow-lg mx-auto" />
+              <img src="/titulo.png" alt="Nelore Brasil" className="h-14 sm:h-20 object-contain relative z-10 drop-shadow-lg mx-auto" />
               <p className="text-[10px] text-neutral-500 tracking-[0.4em] uppercase mt-2">
                 Tradição & Qualidade
               </p>
