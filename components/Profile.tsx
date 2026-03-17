@@ -62,7 +62,7 @@ const Profile: React.FC<ProfileProps> = ({ onSpinFinish, isZooming }) => {
           }}
         />
       </div>
-      <p className="font-display text-sm sm:text-base text-neutral-400 tracking-[0.3em] uppercase opacity-80 -mt-2">
+      <p className="font-display text-sm sm:text-base text-red-800 tracking-[0.3em] uppercase opacity-90 -mt-2">
         A MELHOR
       </p>
     </div>

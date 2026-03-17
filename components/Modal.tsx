@@ -12,15 +12,15 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center p-4" onClick={onClose}>
-      <div className="bg-black border border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-auto p-6 relative max-h-[90vh] overflow-y-auto modal-animate" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-md z-50 flex justify-center items-center p-4" onClick={onClose}>
+      <div className="bg-white border border-black/5 rounded-2xl shadow-2xl w-full max-w-md mx-auto p-6 relative max-h-[90vh] overflow-y-auto overflow-x-hidden modal-animate" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-display uppercase tracking-wider text-white">{title}</h2>
-          <button onClick={onClose} className="text-neutral-400 hover:text-white transition-colors">
+          <h2 className="text-2xl font-display uppercase tracking-wider text-neutral-900">{title}</h2>
+          <button onClick={onClose} className="text-neutral-400 hover:text-red-800 transition-colors">
             <XIcon />
           </button>
         </div>
-        <div className="text-neutral-300">
+        <div className="text-neutral-600">
           {children}
         </div>
       </div>

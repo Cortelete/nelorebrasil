@@ -18,10 +18,11 @@ export interface OrderData {
     outros: boolean;
   };
   selectedKits: {
-    proteina: boolean;
-    almocoJantar: boolean;
-    semanal: boolean;
-    churrasco: boolean;
+    churrasco1: boolean;
+    churrascoPremium: boolean;
+    economico: boolean;
+    pratico: boolean;
+    familiar: boolean;
   };
   outrosText: string;
   pickupTime: string;
@@ -32,9 +33,10 @@ export interface KitOrderData {
   name: string;
   pickupTime: string;
   kits: {
-    proteina: number;
-    almocoJantar: number;
-    semanal: number;
-    churrasco: number;
+    churrasco1: number;
+    churrascoPremium: number;
+    economico: number;
+    pratico: number;
+    familiar: number;
   };
 }
