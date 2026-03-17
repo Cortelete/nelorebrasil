@@ -67,31 +67,15 @@ const App: React.FC = () => {
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!carouselRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - carouselRef.current.offsetLeft);
-    setScrollLeft(carouselRef.current.scrollLeft);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !carouselRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - carouselRef.current.offsetLeft;
-    const walk = (x - startX) * 1.2;
-    carouselRef.current.scrollLeft = scrollLeft - walk;
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = 300; // Approximate width of a card + gap
+      carouselRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
@@ -200,7 +184,7 @@ const App: React.FC = () => {
         }
       });
 
-    let fullMessage = `Olá, gostaria de fazer um pedido!\n\n`;
+    let fullMessage = `Olá, Nelore Brasil! Vim pelo link na bio e meu pedido para hoje é:\n\n`;
     fullMessage += `*Nome:* ${orderData.name}\n`;
     if(selectedItems.length > 0) {
       fullMessage += `*Itens de interesse:* ${selectedItems.join(', ')}\n`;
@@ -213,8 +197,9 @@ const App: React.FC = () => {
     }
     fullMessage += `\n`;
     if(orderData.message) {
-      fullMessage += `*Mensagem:*\n${orderData.message}`;
+      fullMessage += `*Mensagem:*\n${orderData.message}\n\n`;
     }
+    fullMessage += `Poderia confirmar para mim, por favor?`;
     
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_CLIENT}?text=${encodeURIComponent(fullMessage.trim())}`;
     window.open(whatsappUrl, '_blank');
@@ -309,10 +294,11 @@ const App: React.FC = () => {
       return;
     }
 
-    let message = `Olá! Gostaria de solicitar os seguintes kits:\n\n`;
+    let message = `Olá, Nelore Brasil! Vim pelo link na bio e meu pedido para hoje é:\n\n`;
     message += selectedKits.join('\n');
     message += `\n\n*Nome para retirada:* ${kitOrderData.name}`;
     message += `\n*Horário de retirada:* ${kitOrderData.pickupTime}`;
+    message += `\n\nPoderia confirmar para mim, por favor?`;
 
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_CLIENT}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -332,16 +318,7 @@ const App: React.FC = () => {
     }
   };
   
-  const getPickupTimeConstraints = () => {
-    const today = new Date().getDay();
-    if (today === 0) {
-      return { min: '07:00', max: '13:00' };
-    }
-    return { min: '07:00', max: '20:00' };
-  };
-
   const renderOrderForm = () => {
-    const { min, max } = getPickupTimeConstraints();
     const itemCategories = [
         { id: 'carnes', label: 'Carnes' },
         { id: 'acompanhamentos', label: 'Acompanhamentos' },
@@ -396,10 +373,19 @@ const App: React.FC = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
                 <div>
-                    <label htmlFor="pickupTime" className="block mb-1 text-xs uppercase tracking-wide text-neutral-500">Retirada ({min}-{max})</label>
-                    <input type="time" id="pickupTime" name="pickupTime" onChange={handleOrderChange} value={orderData.pickupTime} min={min} max={max} className="w-full bg-white border border-black/10 rounded-lg p-2 text-neutral-900 focus:border-red-500 focus:outline-none text-sm shadow-sm" />
+                    <span className="block mb-2 text-xs uppercase tracking-wide text-neutral-500">Horário de retirada</span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className={`flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-colors ${orderData.pickupTime === 'Manhã' ? 'bg-red-50 border-red-500 text-red-700 font-medium' : 'bg-white border-black/10 text-neutral-700 hover:bg-neutral-50'}`}>
+                        <input type="radio" name="pickupTime" value="Manhã" checked={orderData.pickupTime === 'Manhã'} onChange={handleOrderChange} className="hidden" required />
+                        Manhã
+                      </label>
+                      <label className={`flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-colors ${orderData.pickupTime === 'Tarde' ? 'bg-red-50 border-red-500 text-red-700 font-medium' : 'bg-white border-black/10 text-neutral-700 hover:bg-neutral-50'}`}>
+                        <input type="radio" name="pickupTime" value="Tarde" checked={orderData.pickupTime === 'Tarde'} onChange={handleOrderChange} className="hidden" required />
+                        Tarde
+                      </label>
+                    </div>
                 </div>
             </div>
 
@@ -604,7 +590,6 @@ const App: React.FC = () => {
           </div>
         );
       case ModalType.KITS:
-        const { min, max } = getPickupTimeConstraints();
         const totalKitQuantity = Object.values(kitOrderData.kits).reduce((sum: number, qty) => sum + (qty as number), 0);
         const isKitSubmitDisabled = totalKitQuantity === 0 || !kitOrderData.name.trim() || !kitOrderData.pickupTime;
         
@@ -618,41 +603,64 @@ const App: React.FC = () => {
 
         return (
           <form onSubmit={handleKitOrderSubmit} className="space-y-4">
-            <div 
-              ref={carouselRef}
-              onMouseDown={handleMouseDown}
-              onMouseLeave={handleMouseLeave}
-              onMouseUp={handleMouseUp}
-              onMouseMove={handleMouseMove}
-              className={`flex overflow-x-auto gap-4 pb-4 no-scrollbar -mx-6 px-6 touch-pan-x ${isDragging ? 'cursor-grabbing snap-none' : 'cursor-grab snap-x snap-mandatory'}`} 
-              style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-              {kitsInfo.map(kit => (
-                <div key={kit.id} className="snap-center w-[85%] sm:w-[280px] shrink-0 bg-neutral-50 p-4 rounded-2xl border border-black/5 flex flex-col justify-between h-full select-none">
-                  <div>
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                          <h4 className="font-bold text-neutral-900 text-lg leading-tight">{kit.name}</h4>
-                          <span className="text-sm text-red-700 font-bold">{kit.price}</span>
+            <div className="relative group">
+              {/* Left Arrow (Desktop only) */}
+              <button 
+                type="button"
+                onClick={() => scrollCarousel('left')}
+                className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white border border-black/10 shadow-md rounded-full w-10 h-10 items-center justify-center text-neutral-600 hover:text-red-600 hover:border-red-200 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+
+              <div 
+                ref={carouselRef}
+                className="flex overflow-x-auto gap-4 pb-4 no-scrollbar -mx-6 px-6 touch-pan-x snap-x snap-mandatory" 
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                {kitsInfo.map(kit => {
+                  const quantity = kitOrderData.kits[kit.id as keyof KitOrderData['kits']] || 0;
+                  const isSelected = quantity > 0;
+                  return (
+                  <div 
+                    key={kit.id} 
+                    className={`snap-center w-[85%] sm:w-[280px] shrink-0 p-4 rounded-2xl border flex flex-col justify-between h-full select-none transition-colors ${isSelected ? 'bg-red-50/40 border-red-500' : 'bg-neutral-50 border-black/5'}`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 className="font-bold text-neutral-900 text-lg leading-tight">{kit.name}</h4>
+                            <span className="text-sm text-red-700 font-bold">{kit.price}</span>
+                        </div>
+                      </div>
+                      <ul className="text-xs text-neutral-600 space-y-1 mb-4 list-disc pl-4">
+                        {kit.items.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/5">
+                      <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Quantidade</span>
+                      <div className="flex items-center space-x-3 bg-white border border-black/10 rounded-xl p-1 shadow-sm">
+                        <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], -1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors">-</button>
+                        <span className="font-bold text-neutral-900 w-6 text-center text-base">{quantity}</span>
+                        <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors">+</button>
                       </div>
                     </div>
-                    <ul className="text-xs text-neutral-600 space-y-1 mb-4 list-disc pl-4">
-                      {kit.items.map((item, idx) => (
-                        <li key={idx}>{item}</li>
-                      ))}
-                    </ul>
                   </div>
-                  
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/5">
-                    <span className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Quantidade</span>
-                    <div className="flex items-center space-x-3 bg-white border border-black/10 rounded-xl p-1 shadow-sm">
-                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], -1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors">-</button>
-                      <span className="font-bold text-neutral-900 w-6 text-center text-base">{kitOrderData.kits[kit.id as keyof KitOrderData['kits']]}</span>
-                      <button type="button" onClick={() => handleKitQuantityChange(kit.id as keyof KitOrderData['kits'], 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition-colors">+</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
+
+              {/* Right Arrow (Desktop only) */}
+              <button 
+                type="button"
+                onClick={() => scrollCarousel('right')}
+                className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white border border-black/10 shadow-md rounded-full w-10 h-10 items-center justify-center text-neutral-600 hover:text-red-600 hover:border-red-200 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
             </div>
 
             <div className="bg-neutral-50 p-3 rounded-xl border border-black/5 space-y-3">
@@ -660,9 +668,22 @@ const App: React.FC = () => {
                 <span className="text-sm font-medium text-neutral-700">Total de Kits:</span>
                 <span className="text-lg font-bold text-red-700">{totalKitQuantity}</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                  <input type="text" name="name" onChange={handleKitInfoChange} value={kitOrderData.name} required placeholder="Seu nome" className="bg-white border border-black/10 text-neutral-900 text-sm rounded-lg p-3 focus:border-red-500 outline-none shadow-sm transition-colors" />
-                  <input type="time" name="pickupTime" onChange={handleKitInfoChange} value={kitOrderData.pickupTime} min={min} max={max} required className="bg-white border border-black/10 text-neutral-900 text-sm rounded-lg p-3 focus:border-red-500 outline-none shadow-sm transition-colors" />
+              <div className="space-y-3">
+                <input type="text" name="name" onChange={handleKitInfoChange} value={kitOrderData.name} required placeholder="Seu nome" className="w-full bg-white border border-black/10 text-neutral-900 text-sm rounded-lg p-3 focus:border-red-500 outline-none shadow-sm transition-colors" />
+                
+                <div className="space-y-2">
+                  <span className="text-sm font-medium text-neutral-700 block">Horário de retirada:</span>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className={`flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-colors ${kitOrderData.pickupTime === 'Manhã' ? 'bg-red-50 border-red-500 text-red-700 font-medium' : 'bg-white border-black/10 text-neutral-700 hover:bg-neutral-50'}`}>
+                      <input type="radio" name="pickupTime" value="Manhã" checked={kitOrderData.pickupTime === 'Manhã'} onChange={handleKitInfoChange} className="hidden" required />
+                      Manhã
+                    </label>
+                    <label className={`flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-colors ${kitOrderData.pickupTime === 'Tarde' ? 'bg-red-50 border-red-500 text-red-700 font-medium' : 'bg-white border-black/10 text-neutral-700 hover:bg-neutral-50'}`}>
+                      <input type="radio" name="pickupTime" value="Tarde" checked={kitOrderData.pickupTime === 'Tarde'} onChange={handleKitInfoChange} className="hidden" required />
+                      Tarde
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
